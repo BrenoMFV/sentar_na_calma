@@ -1,0 +1,6 @@
+package com.sentar_na_calma.frontend;
+
+import io.flutter.embedding.android.FlutterActivity;
+
+public class MainActivity extends FlutterActivity {
+}
