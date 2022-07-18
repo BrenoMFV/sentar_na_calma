@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/utils/colors.dart';
 
-import '../auth_form/auth_form_view.dart';
+import 'package:frontend/ui/views/auth/auth_form/auth_form_view.dart';
+import 'package:frontend/utils/colors.dart';
 
 class AuthView extends StatelessWidget {
   const AuthView({Key? key}) : super(key: key);

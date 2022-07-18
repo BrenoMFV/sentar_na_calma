@@ -4,7 +4,6 @@ import 'package:frontend/models/user.dart';
 import 'package:frontend/services/navigation_service.dart';
 import 'package:frontend/ui/views/auth/auth_form/auth_form_viewmodel.dart';
 import 'package:frontend/ui/views/auth/auth_view/auth_view.dart';
-import 'package:frontend/ui/views/auth_or_home_view.dart';
 import 'package:frontend/ui/views/home/home_view.dart';
 import 'package:frontend/ui/views/meditation_timer/meditation_timer_view.dart';
 import 'package:frontend/utils/colors.dart';
