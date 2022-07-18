@@ -5,12 +5,8 @@ class User with ChangeNotifier {
   String? _email;
   String? _token;
 
-  User();
-
   String? get token => _token ?? '';
-
   String? get username => _username ?? '';
-
   String? get email => _email ?? '';
 
   bool get isAuthenticated {

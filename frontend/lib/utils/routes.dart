@@ -1,5 +1,5 @@
 class AppRoutes {
-  static const authOrHome = '/';
-  static const auth = '/auth';
+  static const auth = '/';
+  static const home = '/home-view';
   static const meditationTimer = '/meditatiom-timer-view';
 }

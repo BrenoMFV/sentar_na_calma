@@ -1,19 +1,20 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frontend/enums/enums.dart';
-import 'package:frontend/models/auth.dart';
+import 'package:frontend/locator.dart';
+import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/models/user.dart';
-import 'package:frontend/services/api_service.dart';
+import 'package:frontend/services/navigation_service.dart';
 import 'package:frontend/utils/custom_exceptions.dart';
 import 'package:frontend/constants/auth_endpoints.dart';
 import 'package:stacked/stacked.dart';
 
 class AuthFormViewModel extends BaseViewModel {
-  Auth auth = Auth();
+  final AuthService _authService = locator.get<AuthService>();
+
+  final NavigationService _navService = locator.get<NavigationService>();
 
   User user = User();
-
-  ApiService _apiService = ApiService();
 
   AuthMode _authMode = AuthMode.login;
 
@@ -51,35 +52,20 @@ class AuthFormViewModel extends BaseViewModel {
 
   // TextEditingController
 
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _passwordConfirmController =
-      TextEditingController();
-
-  TextEditingController get usernameController => _usernameController;
-
-  TextEditingController get emailController => _emailController;
-
-  TextEditingController get passwordController => _passwordController;
-
-  TextEditingController get passwordConfirmController =>
-      _passwordConfirmController;
-
   void saveEmail(String? email) {
-    auth.email = email;
+    _authService.email = email;
   }
 
   void savePassword(String? password) {
-    auth.password1 = password;
+    _authService.password1 = password;
   }
 
   void savePassword2(String? password2) {
-    auth.password2 = password2;
+    _authService.password2 = password2;
   }
 
   void saveUsername(String? username) {
-    auth.username = username;
+    _authService.username = username;
   }
 
   final RegExp _passwordComplexity = RegExp(r'[a-zA-Z0-9]');
@@ -108,13 +94,9 @@ class AuthFormViewModel extends BaseViewModel {
   }
 
   loginOrRegister() {
-    final dynamic response;
-    if (_authMode == AuthMode.login) {
-      response = _apiService.post(_authEndpoint, data: auth.loginJson());
-    } else {
-      response = _apiService.post(_authEndpoint, data: auth.registerJson());
-    }
-    return response;
+    return _authMode == AuthMode.login
+        ? _authService.login()
+        : _authService.register();
   }
 
   Future<void> submit(context) async {
@@ -125,25 +107,9 @@ class AuthFormViewModel extends BaseViewModel {
     _formKey.currentState!.save();
 
     try {
-      final response = await runBusyFuture(loginOrRegister());
-      if (response != null) {
-        final currentUserData = await runBusyFuture(_apiService.get(
-          AuthEndpoint.fetchUser,
-          headers: {
-            'Content-Type': 'application/json',
-            "Authorization": "Token ${response['key']}",
-          },
-        ));
-        user.storeCurrentUser(currentUserData);
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text("Sucesso"),
-              content: Text("Seja bem vindo(a), ${user.username}!"),
-            );
-          },
-        );
+      final bool isAuthenticated = await runBusyFuture(loginOrRegister());
+      if (isAuthenticated) {
+        _navService.redirectAfterLogin();
       }
     } on ObjectNotFoundException catch (e) {
       setError(e.toString());

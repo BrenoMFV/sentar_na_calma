@@ -2,22 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:frontend/ui/views/auth/auth_form/auth_form_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 
-class AuthForm extends StatelessWidget {
+class AuthForm extends StatefulWidget {
   AuthForm({Key? key}) : super(key: key);
 
-  int counter = 1;
+  @override
+  State<AuthForm> createState() => _AuthFormState();
+}
+
+class _AuthFormState extends State<AuthForm> {
+  late final TextEditingController _usernameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _passwordController;
+  late final TextEditingController _passwordConfirmController;
+
+  @override
+  void initState() {
+    _usernameController = TextEditingController();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _passwordConfirmController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _passwordConfirmController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    print("Método build foi chamado $counter");
-    counter++;
     return ViewModelBuilder<AuthFormViewModel>.reactive(
       viewModelBuilder: () => AuthFormViewModel(),
       builder: (context, viewModel, child) {
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
-          key: ValueKey<bool>(viewModel.isLogin),
           child: Card(
+            key: ValueKey<bool>(viewModel.isLogin),
             margin: const EdgeInsets.all(25),
             child: Form(
               key: viewModel.formKey,
@@ -33,7 +57,7 @@ class AuthForm extends StatelessWidget {
                           decoration: const InputDecoration(
                               labelText: "Nome de Usuário"),
                           keyboardType: TextInputType.text,
-                          controller: viewModel.usernameController,
+                          controller: _usernameController,
                           onSaved: (username) =>
                               viewModel.saveUsername(username),
                           validator: (username) =>
@@ -43,11 +67,12 @@ class AuthForm extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
-                        decoration: const InputDecoration(labelText: "E-mail"),
-                        controller: viewModel.emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        onSaved: (email) => viewModel.saveEmail(email),
-                      ),
+                          decoration:
+                              const InputDecoration(labelText: "E-mail"),
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          onSaved: (email) => viewModel.saveEmail(email),
+                          validator: (email) => viewModel.validateEmail(email)),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -66,7 +91,7 @@ class AuthForm extends StatelessWidget {
                           ),
                         ),
                         keyboardType: TextInputType.emailAddress,
-                        controller: viewModel.passwordController,
+                        controller: _passwordController,
                         obscureText: viewModel.obscurePassword,
                         onSaved: (password) => viewModel.savePassword(password),
                       ),
@@ -91,13 +116,12 @@ class AuthForm extends StatelessWidget {
                           ),
                           keyboardType: TextInputType.emailAddress,
                           obscureText: viewModel.obscurePasswordConfirm,
-                          controller: viewModel.passwordConfirmController,
+                          controller: _passwordConfirmController,
                           onSaved: (password2) =>
                               viewModel.savePassword2(password2),
                           validator: (_password2) =>
                               viewModel.validatePasswordConfirmation(
-                                  viewModel.passwordController.text,
-                                  _password2),
+                                  _passwordController.text, _password2),
                         ),
                       ),
                     TextButton(
